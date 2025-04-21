@@ -47,29 +47,7 @@ namespace PizzaApi.Data
                         list => JsonSerializer.Serialize(list, (JsonSerializerOptions?)null)!,  // CLR -> JSON
                         json => JsonSerializer.Deserialize<List<PizzaTopping>>(json, (JsonSerializerOptions?)null)! // JSON -> CLR
                     );
-
-                // ValueComparer for change-tracking of List<PizzaTopping>
-                //var comparer = new ValueComparer<List<PizzaTopping>>(
-                //    (a, b) => a.SequenceEqual(b, new PizzaToppingEquality()),
-                //    list => list.Aggregate(
-                //        0,
-                //        (hash, item) => HashCode.Combine(hash, item.Id, item.Quantity)
-                //    ),
-                //    list => list.ToList()
-                //);
-
-                //prop.Metadata.SetValueComparer(comparer);
             });
         }
-    }
-
-    // Equality comparer for PizzaTopping
-    public class PizzaToppingEquality : IEqualityComparer<PizzaTopping>
-    {
-        public bool Equals(PizzaTopping x, PizzaTopping y)
-            => x.Id == y.Id && x.Quantity == y.Quantity;
-
-        public int GetHashCode(PizzaTopping obj)
-            => HashCode.Combine(obj.Id, obj.Quantity);
     }
 }
