@@ -12,17 +12,18 @@ namespace PizzaApi.Services
         {
             var responseDto = new List<PizzaDto>();
             var pizzas = await db.Pizzas.ToListAsync();
+            var toppings = await db.Toppings.ToListAsync();
             foreach (var pizza in pizzas)
             {
                 var dto = new PizzaDto
                 {
                     Name = pizza.Name,
                     Price = pizza.Price,
-                    Toppings = new List<ToppingDto>()
+                    Toppings = []
                 };
                 foreach (PizzaTopping topping in pizza.Toppings)
                 {
-                    var toppingResult = await db.Toppings.FindAsync(topping.Id);
+                    var toppingResult = toppings.Find(x => x.Id == topping.Id);
                     if (toppingResult is null) continue;
                     dto.Toppings.Add(new ToppingDto
                     {
