@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PizzaContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PizzaDatabase")));
 
-builder.Services.AddScoped<IPizzaService, PizzaService>();
+builder.Services.AddScoped<IMenuService, ManuService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
