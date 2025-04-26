@@ -1,15 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using PizzaApi.Data;
 using PizzaApi.Dtos;
 using PizzaApi.Models;
 using PizzaApi.Services.Interfaces;
+using System.Text.Json;
 
 namespace PizzaApi.Services
 {
-    public class ManuService(PizzaContext db) : IMenuService
+    public class ManuService(PizzaContext db, IDistributedCache cache) : IMenuService
     {
+        private const string _cacheKey = "PizzaMenu";
+
         public async Task<PizzaMenuListDto> GetPizzaMenuAsync()
         {
+            var cached = await cache.GetStringAsync(_cacheKey);
+            if (!string.IsNullOrWhiteSpace(cached))
+            {
+                return JsonSerializer.Deserialize<PizzaMenuListDto>(cached)!;
+            }
+
             var menuResponse = new PizzaMenuListDto();
             var pizzasResponse = new List<PizzaMenuDto>();
             var dbPizzas = await db.Pizzas.ToListAsync();
@@ -44,6 +54,15 @@ namespace PizzaApi.Services
                 Name = x.Name,
                 Price = x.Price
             }).ToList();
+
+            // Cache result
+            var serialized = JsonSerializer.Serialize(menuResponse);
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            };
+
+            await cache.SetStringAsync(_cacheKey, serialized, options);
 
             return menuResponse;
         }

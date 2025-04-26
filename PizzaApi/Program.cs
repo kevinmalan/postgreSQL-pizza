@@ -9,6 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PizzaContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PizzaDatabase")));
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "PizzaApi_";
+});
+
 builder.Services.AddScoped<IMenuService, ManuService>();
 
 builder.Services.AddControllers();
